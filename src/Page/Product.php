@@ -20,6 +20,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ListboxField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBCurrency;
 use SilverStripe\ORM\FieldType\DBDecimal;
@@ -54,9 +55,11 @@ use SilverStripe\SiteConfig\SiteConfig;
  *
  * @method ProductCategory[]|ManyManyList ProductCategories()
  */
-class Product extends Page implements Buyable
+class Product extends DataObject implements Buyable
 {
     private static $db = [
+        'Title' => 'Varchar(255)',
+        'URLSegment' => 'Varchar(255)',
         'InternalItemID' => 'Varchar(30)', //ie SKU, ProductID etc (internal / existing recognition of product)
         'Model' => 'Varchar(30)',
 
@@ -269,11 +272,8 @@ class Product extends Page implements Buyable
      */
     private function getCategoryOptionsNoParent()
     {
-        $ancestors = $this->getAncestors()->column('ID');
         $categories = ProductCategory::get();
-        if (!empty($ancestors)) {
-            $categories = $categories->exclude('ID', $ancestors);
-        }
+
         return $categories->map('ID', 'NestedTitle')->toArray();
     }
 
@@ -285,10 +285,7 @@ class Product extends Page implements Buyable
     public function getCategoryIDs()
     {
         $ids = [];
-        //ancestors
-        foreach ($this->getAncestors() as $ancestor) {
-            $ids[$ancestor->ID] = $ancestor->ID;
-        }
+
         //additional categories
         $ids += $this->ProductCategories()->getIDList();
 
