@@ -70,14 +70,6 @@ class Variation extends DataObject implements Buyable
         'Price' => 'Currency'
     ];
 
-    private static $versioning = [
-        'Live'
-    ];
-
-    private static $extensions = [
-        Versioned::class . '.versioned'
-    ];
-
     private static $summary_fields = [
         'InternalItemID' => 'Product Code',
         //'Product.Title' => 'Product',
