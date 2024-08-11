@@ -4,6 +4,7 @@ namespace SilverShop\Model;
 
 use SilverShop\Cart\ShoppingCartController;
 use SilverShop\Forms\ShopQuantityField;
+use SilverStripe\Control\Controller;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\FieldType\DBCurrency;
 
@@ -83,12 +84,24 @@ class OrderItem extends OrderAttribute
      */
     public function UnitPrice()
     {
-        if ($this->Order()->IsCart()) {
+        $session = Controller::curr()?->getRequest()->getSession();
+        $priceList = $session?->get('orderUnitPriceList')?? [];
+        $order = $this->Order();
+
+        if (isset($priceList[$order->ID][$this->ID])) {
+            return $priceList[$order->ID][$this->ID];
+        }
+
+        if ($order->IsCart()) {
             $buyable = $this->Buyable();
             $unitprice = ($buyable) ? $buyable->sellingPrice() : $this->UnitPrice;
             $this->extend('updateUnitPrice', $unitprice);
+            $priceList[$order->ID][$this->ID] = $unitprice;
+            $session?->set('orderUnitPriceList', $priceList);
+
             return $this->UnitPrice = $unitprice;
         }
+
         return $this->UnitPrice;
     }
 
