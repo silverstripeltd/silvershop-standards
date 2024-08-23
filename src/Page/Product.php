@@ -74,6 +74,7 @@ class Product extends DataObject implements Buyable
 
         'Featured' => 'Boolean',
         'AllowPurchase' => 'Boolean',
+        'ShowInSearch' => 'Boolean',
 
         'Popularity' => 'Float' //storage for CalculateProductPopularity task
     ];
